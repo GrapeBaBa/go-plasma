@@ -1,0 +1,29 @@
+language: go
+go:
+  - "1.10.x"
+
+sudo: required
+
+#os: linux
+
+# Only clone the most recent commit.
+git:
+  depth: false
+  quiet: true
+#  submodules:
+#    true
+
+# safelist
+branches:
+  only:
+  - master
+
+# Skip the install step. Don't `go get` dependencies. Only build with the code in vendor/
+install: true
+
+jobs:
+  include:
+    - stage: "PlasmaChain"
+      script: make plasmachaintest -C ~/gopath/src/github.com/wolkdb/go-plasma
+      after_success:
+              - make plasma -C ~/gopath/src/github.com/wolkdb/go-plasma
