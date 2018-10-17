@@ -60,7 +60,6 @@ func New(ctx *node.ServiceContext, config *Config, simulated bool) (*PlasmaChain
 
 	var self PlasmaChain
 
-	err := self.setRootContract(contractAddr, rpc_endpointUrl, ws_endpointUrl, operatorPrivateKey)
 	self.config = config
 	err := self.setRootContract(self.config.RootContractAddr, self.config.L1rpcEndpointUrl, self.config.L1wsEndpointUrl, self.config.operatorKey)
 	if err != nil {
