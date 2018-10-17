@@ -14,15 +14,31 @@ To get started, we recommend reading:
 * [Plasma Cash with Sparse Merkle Trees and Bloom filters](https://ethresear.ch/t/plasma-cash-with-sparse-merkle-trees-bloom-filters-and-probabilistic-transfers/2006)
 
 # Plasma Node
-Pre-build plasma binary can be found on our website [TBA]. Alternatively, you can build plasma binary from the source:
+
+### Prerequisites and Installation
+
+Prerequisites:
+* Option A - Layer 2 plasma node only: { [Golang](https://golang.org/doc/install) }
+* Option B - Layer 2 plasma node + rootcontact Listener { [Golang](https://golang.org/doc/install) +  [Node.js](https://nodejs.org) + [npm](https://www.npmjs.com/get-npm) + [web3](https://www.npmjs.com/package/web3) + [ganache-cli](https://github.com/trufflesuite/ganache-cli) }
+
+
+Pre-build plasma binary can be found on our website [TBA]. Alternatively, plasma binary can be built from the source:
+
 ```
 # Build plasma binary
+$ mkdir -p $(cut -d':' -f1 <<<"$GOPATH")/src/github.com/wolkdb
+$ cd $(cut -d':' -f1 <<<"$GOPATH")/src/github.com/wolkdb
+$ git clone https://github.com/wolkdb/go-plasma.git
+$ cd go-plasma
 $ make plasma
+
 build/env.sh go run build/ci.go install ./cmd/plasma
->>> /usr/local/go/bin/go install -ldflags -X main.gitCommit=fdc5f7b81073c35f1fd36efe4f6ca1c0f2f4f0a6 -s -v ./cmd/plasma
+>>> /usr/local/go/bin/go install -ldflags -X main.gitCommit=0ef09eae7cd97c7b65a1d0d7ad5f5e0360a9efd2 -s -v ./cmd/plasma
 ...
 Done building.
-Run './build/bin/plasma --rpc --rpcaddr "localhost" --rpcport 8505 --rpcapi "admin, personal,db,eth,net,web3,swarmdb,plasma"' to launch plasma.
+
+To launch plasma, Run:
+./build/bin/plasma --rpc --rpcaddr 'localhost' --rpcport 8505 --rpcapi 'admin, personal,db,eth,net,web3,swarmdb,plasma'
 ```
 
 ### Get Started
@@ -41,10 +57,10 @@ MISC OPTIONS:
 
 ```
 
-Running plasma node (Layer 2 only, without RootChain):
+ Option A - Running Layer 2 plasma node only, without RootChain:
 ```
 # Run POA plasma node, enabling RPC services at port 8505
-$ ./build/bin/plasma --datadir /tmp/datadir3 --plasma.datadir /tmp/plasma3 --port 30303  --verbosity 4 --rpc --rpcaddr "localhost" --rpcport 8505 --rpcapi "personal,db,eth,net,web3,swarmdb,plasma"
+$ ./build/bin/plasma --datadir /tmp/datadir3 --plasma.datadir /tmp/plasma3 --port 30303  --verbosity 4 --rpc --rpcaddr 'localhost' --rpcport 8505 --rpcapi 'personal,db,eth,net,web3,swarmdb,plasma'
 
 # [Optional] Run multiple plasma nodes, peer with master, neighbors, etc.
 $ ./build/bin/plasma --datadir /tmp/datadir4 --plasma.datadir /tmp/plasma4 --port 30304  --verbosity 4
@@ -59,13 +75,15 @@ Deposit:  TokenID b76883d225414136 | Denomination 2000000000000000000 | DepositI
 Deposit:  TokenID 09af84bc1208918b | Denomination 3000000000000000000 | DepositIndex 3  (Depositor: 0xBef06CC63C8f81128c26efeDD461A9124298092b, TxHash: 0x4fdcebb3247a9a715e416e68439e563e8faf57c804642441b93724d5b4fe0878)
 Deposit:  TokenID 7c00dfa72e8832ed | Denomination 4000000000000000000 | DepositIndex 4  (Depositor: 0x74f978A3E049688777E6120D293F24348BDe5fA6, TxHash: 0xa268b3f36d3bbdb30b549f99fe0f7e7c35a2cd9598518a0c3116aa3ddc8fd68d)
 ```
-Running plasma node (Layer 2 + Listener, with RootChain):
+
+ Option B - Running Layer 2 plasma node + Listener, with RootChain:
+
 ```
 # Start Ganache backend
 $ sh ./plasmachain/contracts/RootChain/Util/init_ganache-cli.sh
 
 # Run POA plasma node, set useLayer1 flag, and enabling RPC services at port 8505
-$ ./build/bin/plasma --datadir /tmp/datadir3 --plasma.datadir /tmp/plasma3 --port 30303  --verbosity 4 --rpc --rpcaddr "localhost" --rpcport 8505 --rpcapi "personal,db,eth,net,web3,swarmdb,plasma" --uselayer1 --rootcontract "0xa611dD32Bb2cC893bC57693bFA423c52658367Ca"
+$ ./build/bin/plasma --datadir /tmp/datadir3 --plasma.datadir /tmp/plasma3 --port 30303  --verbosity 4 --rpc --rpcaddr 'localhost' --rpcport 8505 --rpcapi 'personal,db,eth,net,web3,swarmdb,plasma' --uselayer1 --rootcontract '0xa611dD32Bb2cC893bC57693bFA423c52658367Ca'
 
 # Start event-listner
 $ node ./plasmachain/contracts/RootChain/listener/listener.js writeLog /plasmachain/contracts/RootChain/listener/events.log
