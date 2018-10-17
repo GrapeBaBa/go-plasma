@@ -204,6 +204,33 @@ var (
 		Usage: "Directory for local plasma chunk storage",
 		Value: plasmachain.DefaultConfig.DataDir,
 	}
+	Layer1Flag = cli.BoolFlag{
+		Name:  "uselayer1",
+		Usage: "Connect to Layer 1",
+	}
+
+	RemoteStorageFlag = cli.BoolFlag{
+		Name:  "useremotestorage",
+		Usage: "Enable Wolk Remotestorage backend",
+	}
+
+	Layer1rpcEndpointFlag = cli.StringFlag{
+		Name:  "l1rpcendpoint",
+		Usage: "Layer 1 RootChain rpc endpoint URL ",
+		Value: plasmachain.DefaultConfig.L1rpcEndpointUrl,
+	}
+
+	Layer1wsEndpointFlag = cli.StringFlag{
+		Name:  "l1wsendpoint",
+		Usage: "Layer 1 RootChain websocket endpoint URL ",
+		Value: plasmachain.DefaultConfig.L1wsEndpointUrl,
+	}
+
+	RootContractFlag = cli.StringFlag{
+		Name:  "rootcontract",
+		Usage: "Layer 1 Rootcontract Address ",
+		Value: plasmachain.DefaultConfig.RootContractAddr,
+	}
 
 	// Ethash settings
 	EthashCacheDirFlag = DirectoryFlag{
@@ -1087,9 +1114,31 @@ func checkExclusive(ctx *cli.Context, args ...interface{}) {
 func SetPlasmaConfig(ctx *cli.Context, cfg *plasmachain.Config) {
 	if ctx.GlobalIsSet(PlasmaDataDirFlag.Name) {
 		cfg.DataDir = ctx.GlobalString(PlasmaDataDirFlag.Name)
-		log.Info("SetPlasmaConfig 1", "datadir", cfg.DataDir)
 	}
-	log.Info("SetPlasmaConfig DONE", "datadir", cfg.DataDir)
+	if ctx.GlobalBool(Layer1Flag.Name) {
+		cfg.UseLayer1 = true
+	}
+
+	if ctx.GlobalBool(Layer1Flag.Name) {
+		//cfg.UseLayer1 = true //disabled for now
+	}
+
+	if ctx.GlobalIsSet(Layer1rpcEndpointFlag.Name) {
+		cfg.L1rpcEndpointUrl = ctx.GlobalString(Layer1rpcEndpointFlag.Name)
+	}
+
+	if ctx.GlobalIsSet(Layer1wsEndpointFlag.Name) {
+		cfg.L1wsEndpointUrl = ctx.GlobalString(Layer1wsEndpointFlag.Name)
+	}
+
+	if ctx.GlobalIsSet(RootContractFlag.Name) {
+		if common.IsHexAddress(ctx.GlobalString(RootContractFlag.Name)) {
+			cfg.RootContractAddr = ctx.GlobalString(RootContractFlag.Name)
+		} else {
+			Fatalf("Trying to set invalid RootContract addr %v", ctx.GlobalString(RootContractFlag.Name))
+		}
+	}
+	log.Info("SetPlasmaConfig", "datadir", cfg.DataDir, "uselayer1", cfg.UseLayer1, "RootContract", cfg.RootContractAddr)
 }
 
 // SetPlasmaConfig applies plasma related command line flags to the config.

@@ -28,22 +28,6 @@ import (
 	"github.com/wolkdb/go-plasma/smt"
 )
 
-const (
-	maxUsers  = 10
-	maxTokens = 100
-	useLayer1 = false
-)
-
-var (
-	contractAddr       = common.HexToAddress("0xa611dD32Bb2cC893bC57693bFA423c52658367Ca")
-	operatorAddress    = "0xA45b77a98E2B840617e2eC6ddfBf71403bdCb683"
-	operatorPrivateKey = "6545ddd10c1e0d6693ba62dec711a2d2973124ae0374d822f845d322fb251645"
-	rpc_endpointUrl    = "http://localhost:8545"
-	ws_endpointUrl     = "ws://localhost:8545"
-	//rpc_endpointUrl  = "https://rinkeby.infura.io/metamask"
-	//ws_endpointUrl   = "wss://rinkeby.infura.io/ws"
-)
-
 type PlasmaChain struct {
 	connWS          *ethclient.Client
 	session         *RootChainSession
@@ -77,19 +61,20 @@ func New(ctx *node.ServiceContext, config *Config, simulated bool) (*PlasmaChain
 	var self PlasmaChain
 
 	err := self.setRootContract(contractAddr, rpc_endpointUrl, ws_endpointUrl, operatorPrivateKey)
+	self.config = config
+	err := self.setRootContract(self.config.RootContractAddr, self.config.L1rpcEndpointUrl, self.config.L1wsEndpointUrl, self.config.operatorKey)
 	if err != nil {
-		if simulated {
-			log.Info("setRootContract", "error", err, "Action", "Proceed")
-		} else {
+		if self.config.UseLayer1 {
 			log.Error("setRootContract", "error", err, "Action", "Terminated")
 			return nil, err
+		} else {
+			log.Info("setRootContract", "error", err, "Action", "Proceed")
 		}
 	}
 
 	self.eventMux = new(event.TypeMux) // SHOULD BE: ctx.EventMux
 	self.DefaultHashes = smt.ComputeDefaultHashes()
 
-	self.config = config
 	self.shutdownChan = make(chan bool)
 	self.networkId = config.NetworkId
 	self.chainType = "plasma"
@@ -242,7 +227,7 @@ func (self *PlasmaChain) InsertChainForPOA(chain deep.Blocks) (int, error) {
 	//self.blockNumber = blocknumber
 	self.blockNumber = self.currentBlock.Number()
 	log.Info("🔨 block to mine", "self.currentBlock number", self.currentBlock.Number(), "self.blockNumber", self.blockNumber)
-	if useLayer1 {
+	if self.config.UseLayer1 {
 		self.publishBlock(self.currentBlock.header.TransactionRoot, self.currentBlock.Number(), true)
 		log.Info("Rootchain >> publishBlock", "block#", self.currentBlock.Number(), "TransactionRoot", self.currentBlock.header.TransactionRoot)
 	}
@@ -279,18 +264,17 @@ func (self *PlasmaChain) MakeBlock(parentHash common.Hash, dhdr deep.Header, bn 
 		}
 	}
 
-	operatorKey, _ := crypto.HexToECDSA(operatorPrivateKey)
 	body := &Body{
 		Layer2Transactions: plasmaTxs,
 		AnchorTransactions: anchorTxs,
 	}
-	hdr.SignHeader(operatorKey)
+	hdr.SignHeader(self.operatorKey)
 
 	block := &Block{
 		header: hdr,
 		body:   body,
 	}
-	block.SignBlock(operatorKey)
+	block.SignBlock(self.operatorKey)
 	return block, nil
 }
 
@@ -910,7 +894,7 @@ func (self *PlasmaChain) insertChain(chain deep.Blocks) (int, []interface{}, err
 	//WriteHeadBlockHash(self.Chunkstore, currentHead.Hash())
 	self.currentBlock = lastCanon
 	//	self.PostChainEvents(events)
-	// if uselayer1 {
+	// if self.config.UseLayer1 {
 	// 	self.publishBlock(self.currentBlock.TransactionRoot, self.currentBlock.BlockNumber, true)
 	// 	log.Info("Rootchain >> publishBlock", "block#", self.currentBlock.Number(), "TransactionRoot", self.currentBlock.TransactionRoot)
 	// }
@@ -1404,7 +1388,7 @@ func (self *PlasmaChain) processDeposit(tokenID []byte, t *TokenInfo) (err error
 	tokenID8 := tokenID
 	token := NewToken(t.DepositIndex, t.Denomination, t.Depositor)
 	tx := NewTransaction(token, t, &(t.Depositor))
-	a := common.HexToAddress(operatorAddress)
+	a := crypto.PubkeyToAddress(self.operatorKey.PublicKey)
 	tx.PrevOwner = &a
 	err = tx.SignTx(self.operatorKey)
 	if err != nil {
@@ -1432,14 +1416,20 @@ func (self *PlasmaChain) challenge(challenger common.Address, tokenID uint64, ts
 
 /* RootChain Contract Related */
 /* ========================================================================== */
-func (self *PlasmaChain) setRootContract(contractAddr common.Address, rpc_endpointUrl, ws_endpointUrl, operatorPrivateKey string) (err error) {
+func (self *PlasmaChain) setRootContract(contractAddr, rpc_endpointUrl, ws_endpointUrl, operatorPrivateKey string) (err error) {
+
+	if !common.IsHexAddress(contractAddr) {
+		return fmt.Errorf("Invalid contract Address %v", contractAddr)
+	}
+
+	rootContract := common.HexToAddress(contractAddr)
 	if self.operatorKey, err = crypto.HexToECDSA(operatorPrivateKey); err != nil {
 		return err
 	}
 	if self.connWS, err = setConnection(ws_endpointUrl); err != nil {
 		return err
 	}
-	if self.session, err = setSession(contractAddr, rpc_endpointUrl, self.operatorKey); err != nil {
+	if self.session, err = setSession(rootContract, rpc_endpointUrl, self.operatorKey); err != nil {
 		return err
 	}
 	return nil
@@ -1452,15 +1442,15 @@ func (self *PlasmaChain) loadLastState(simulated bool) error {
 		self.blockNumber = 0
 		self.currentBlock = b
 		//TODO: simulated should set to false in defaultsetting
-		if !useLayer1 {
-			self.initDeposit(maxTokens, simulated)
+		if !self.config.UseLayer1 {
+			self.initDeposit(10, simulated)
 		}
 	} else {
 		b := NewBlock()
 		//self.blockNumber = 1 // the one we are working on right now, not the most recent block
 		self.blockNumber = 0
 		self.currentBlock = b
-		self.initDeposit(maxTokens, false)
+		self.initDeposit(10, simulated)
 	}
 	return nil
 }
@@ -1473,7 +1463,7 @@ func (self *PlasmaChain) loadLastState(simulated bool) error {
 func (self *PlasmaChain) initDeposit(maxTokens uint64, simulated bool) (err error) {
 
 	if simulated {
-		fmt.Printf("Simulation : %v, preparing test deposits\n", simulated)
+		//fmt.Printf("Simulation : %v, preparing test deposits\n", simulated)
 		for i := uint64(0); i < 5; i++ {
 			var tinfo *TokenInfo
 			var tokenID uint64

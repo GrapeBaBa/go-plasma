@@ -90,11 +90,9 @@ func (s *PublicPlasmaAPI) GetPlasmaToken(ctx context.Context, tokenID hexutil.Ui
 
 	o := make(map[string]interface{})
 	t, tinfo, err := s.b.GetPlasmaToken(tokenID, blockNumber)
-	//t, tinfo, err := s.b.GetToken(tokenID, blockNumber)
 	if err != nil {
 		o["err"] = fmt.Sprintf("%v", err)
 	} else {
-		//o = t.OutputToken(false)
 		o["token"] = t
 		o["tokenInfo"] = tinfo
 	}

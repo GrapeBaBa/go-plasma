@@ -105,6 +105,11 @@ var (
 		utils.MetricsEnabledFlag,
 		utils.ExtraDataFlag,
 		configFileFlag,
+		utils.Layer1Flag,
+		utils.RootContractFlag,
+		utils.Layer1rpcEndpointFlag,
+		utils.Layer1wsEndpointFlag,
+		utils.RemoteStorageFlag,
 	}
 
 	rpcFlags = []cli.Flag{

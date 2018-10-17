@@ -45,6 +45,7 @@ func TestBlock(t *testing.T) {
 		tx := NewTransaction(token, tokenInfo, &recipient)
 		u.body.Layer2Transactions = append(u.body.Layer2Transactions, tx)
 	}
+	operatorPrivateKey := "6545ddd10c1e0d6693ba62dec711a2d2973124ae0374d822f845d322fb251645"
 	pkey, err := crypto.HexToECDSA(operatorPrivateKey)
 	if err != nil {
 		t.Fatalf("No privatekey")

@@ -149,7 +149,7 @@ func (minter *minterPOA) mintNewBlock() error {
 		return fmt.Errorf("[deep:poa:mintNewBlock] %s", err)
 	}
 
-	log.Info("setting state of minter to", "state", state)
+	//log.Info("setting state of minter to", "state", state)
 	minter.state = state
 	committedTxes := minter.commitTransactions(allAddrTxes, minter.chain)
 	committedTxesCount := len(committedTxes)

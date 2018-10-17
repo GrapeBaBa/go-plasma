@@ -15,6 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/sha3"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/wolkdb/go-plasma/deep"
 	"github.com/wolkdb/go-plasma/smt"
@@ -62,27 +63,16 @@ type Header struct {
 }
 
 type encHeader struct {
-	ParentHash  common.Hash `json:"parentHash"`
-	BlockNumber uint64      `json:"blockNumber"`
-	Time        uint64      `json:"time"`
-
-	// incremental token transactions -- used in L1
-	BloomID         common.Hash `json:"bloomID"`
-	TransactionRoot common.Hash `json:"transactionRoot"`
-
-	// all token storage
-	TokenRoot common.Hash `json:"tokenRoot"`
-
-	// all account storage
-	AccountRoot common.Hash `json:"accountRoot"`
-
-	// l3 blockcahins storage
-	L3ChainRoot common.Hash `json:"l3ChainRoot"`
-
-	// incremental Anchor transactions
-	AnchorRoot common.Hash `json:"anchorRoot"`
-
-	Sig []byte `json:"sig"` // was: sig
+	ParentHash      common.Hash `json:"parentHash"`
+	BlockNumber     uint64      `json:"blockNumber"`
+	Time            uint64      `json:"time"`
+	BloomID         common.Hash `json:"bloomID"`         // incremental plasma transactions -- build at each block
+	TransactionRoot common.Hash `json:"transactionRoot"` // incremental plasma transactions -- used in L1
+	TokenRoot       common.Hash `json:"tokenRoot"`       // all token storage
+	AccountRoot     common.Hash `json:"accountRoot"`     // all account storage
+	L3ChainRoot     common.Hash `json:"l3ChainRoot"`     // l3 blockcahins storage
+	AnchorRoot      common.Hash `json:"anchorRoot"`      // incremental Anchor transactions
+	Sig             []byte      `json:"sig"`
 }
 
 //# go:generate gencodec -type Header -field-override headetMarshaling -out header_json.go
@@ -221,11 +211,13 @@ func (block *Block) GetSigner() (signer common.Address, err error) {
 func (block *Block) ValidateBlock() (validated bool, err error) {
 	signer, err := block.GetSigner()
 	if err != nil {
+		log.Info("ValidateBlock ERR", "signer", signer)
 		return false, err
 	}
-	if bytes.Compare(common.HexToAddress(operatorAddress).Bytes(), signer.Bytes()) != 0 {
-		return false, fmt.Errorf("Invalid block signer %x %x", signer.Bytes(), common.HexToAddress(operatorAddress).Bytes())
-	}
+	//TODO: block requires minter addr to validate
+	// if bytes.Compare(common.HexToAddress(operatorAddress).Bytes(), signer.Bytes()) != 0 {
+	// 	return false, fmt.Errorf("Invalid block signer %x %x", signer.Bytes(), common.HexToAddress(operatorAddress).Bytes())
+	// }
 
 	return true, nil
 }
