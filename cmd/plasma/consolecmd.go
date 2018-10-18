@@ -1,7 +1,7 @@
-// Copyright 2016 Wolk Inc.
-// This file is part of go-ethereum.
-//
-// go-ethereum is free software: you can redistribute it and/or modify
+// Copyright 2018 Wolk Inc.
+// This file is part of the Wolk go-plasma library.
+// as adapted from go-ethereum
+// This go-plasma + go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.

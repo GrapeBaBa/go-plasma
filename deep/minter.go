@@ -1,3 +1,7 @@
+// Copyright 2018 Wolk Inc.  All rights reserved.
+// This file is part of the Wolk go-plasma library.
+
+// adapted from
 // Copyright 2015 The go-ethereum Authors
 // This file is part of the go-ethereum library.
 //

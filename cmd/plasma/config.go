@@ -1,7 +1,7 @@
-// Copyright 2017 Wolk Inc.
-// This file is part of go-ethereum.
-//
-// go-ethereum is free software: you can redistribute it and/or modify
+// Copyright 2018 Wolk Inc.
+// This file is part of the Wolk go-plasma library.
+// as adapted from go-ethereum
+// This go-plasma + go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -131,7 +131,7 @@ func makeConfigNode(ctx *cli.Context) (*node.Node, plasmaConfig) {
 func makeFullNode(ctx *cli.Context) *node.Node {
 	stack, cfg := makeConfigNode(ctx)
 	ch_p := make(chan *plasmachain.PlasmaChain, 1)
-	
+
 	var err error
 	err = stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
 		deepchain, err := plasmachain.New(ctx, &(cfg.Plasma), true)
@@ -147,8 +147,8 @@ func makeFullNode(ctx *cli.Context) *node.Node {
 	}
 	log.Info("plasmachain SUCCESS")
 
-        mintTimeMillis := ctx.GlobalInt(utils.MintTimeFlag.Name)
-        mintTime := time.Duration(mintTimeMillis) * time.Millisecond
+	mintTimeMillis := ctx.GlobalInt(utils.MintTimeFlag.Name)
+	mintTime := time.Duration(mintTimeMillis) * time.Millisecond
 
 	err = stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
 		deepchain := <-ch_p

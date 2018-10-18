@@ -1,5 +1,5 @@
 // Copyright 2018 Wolk Inc.
-// This file is part of the Wolk Deep Blockchains library.
+// This file is part of the Wolk go-plasma library.
 package web3ext
 
 var Modules = map[string]string{

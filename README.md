@@ -2,9 +2,9 @@
 ## go-plasma [![Build Status](https://travis-ci.com/wolkdb/go-plasma.svg?token=Gtdcx5vGAnAVJ2NfpEhk&branch=master)](https://travis-ci.com/wolkdb/go-plasma)
 
 
-Reference implementation of plasma in Go.  Wolk has augmented Plasma to support the *Deep BlockChains Architecture* described in this [paper](https://github.com/wolkdb/deepblockchains/blob/master/Deep_Blockchains.pdf).
+Reference implementation of plasma in Go.  Wolk has augmented Plasma to support the *Deep Blockchain Architecture* described in this [paper](https://github.com/wolkdb/deepblockchains/blob/master/Deep_Blockchains.pdf).
 
-Currently, Wolk is exploring a generalized "plasma cashflow" implementation, where network fees can flow between token owner and operator; in particular, we are extending the original {deposit, exit} schemes with partial withdraw functionality, which will enable operator to withdraw fees without forcing users to exist tokens on the mainNet.
+Currently, Wolk is exploring a "Plasma Hybrid" implementation, where network fees can flow between token owner and operator; in particular, we are extending the original {deposit, exit} schemes with partial withdraw functionality, which will enable operator to withdraw fees without forcing users to exist tokens on the mainNet.
 
 ## Background
 
