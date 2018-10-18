@@ -1,5 +1,6 @@
 
-## go-plasma
+## go-plasma [![Build Status](https://travis-ci.com/wolkdb/go-plasma.svg?token=Gtdcx5vGAnAVJ2NfpEhk&branch=master)](https://travis-ci.com/wolkdb/go-plasma)
+
 
 Reference implementation of plasma in Go.  Wolk has augmented Plasma to support the *Deep BlockChains Architecture* described in this [paper](https://github.com/wolkdb/deepblockchains/blob/master/Deep_Blockchains.pdf).
 
