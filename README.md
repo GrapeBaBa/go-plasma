@@ -1,5 +1,7 @@
 
-## go-plasma [![Build Status](https://travis-ci.com/wolkdb/go-plasma.svg?token=Gtdcx5vGAnAVJ2NfpEhk&branch=master)](https://travis-ci.com/wolkdb/go-plasma)
+## go-plasma
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://github.com/wolkdb/go-plasma/blob/master/LICENSE.md) [![Build Status](https://travis-ci.com/wolkdb/go-plasma.svg?token=Gtdcx5vGAnAVJ2NfpEhk&branch=master)](https://travis-ci.com/wolkdb/go-plasma)
 
 
 Reference implementation of plasma in Go.  Wolk has augmented Plasma to support the *Deep Blockchain Architecture* described in this [paper](https://github.com/wolkdb/deepblockchains/blob/master/Deep_Blockchains.pdf).
@@ -10,9 +12,12 @@ Currently, Wolk is exploring a "Plasma Hybrid" implementation, where network fee
 
 To get started, we recommend reading:
 
-* [Deep Blockchains: The Scalable Multilayer Blockchains](https://github.com/wolkdb/deepblockchains/blob/master/Deep_Blockchains.pdf)
+* [Learn Plasma](https://www.learnplasma.org)
+
+* [Deep Blockchains: The Scalable Multilayer Blockchain](https://github.com/wolkdb/deepblockchains/blob/master/Deep_Blockchains.pdf)
 
 * [Plasma Cash with Sparse Merkle Trees and Bloom filters](https://ethresear.ch/t/plasma-cash-with-sparse-merkle-trees-bloom-filters-and-probabilistic-transfers/2006)
+
 
 # Plasma Node
 
