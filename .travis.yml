@@ -23,8 +23,8 @@ install: true
 
 jobs:
   include:
-    - stage: "PlasmaChain"
-      script: make plasmachaintest -C ~/gopath/src/github.com/wolkdb/go-plasma
-      after_success:
-              - make plasma -C ~/gopath/src/github.com/wolkdb/go-plasma
-      name: "PlasmaChain - make test and compile"
+    - stage: "PlasmaChain Test"
+      script: make test -C ~/gopath/src/github.com/wolkdb/go-plasma
+
+    - stage: "Compile PlasmaChain"
+      script: make plasma -C ~/gopath/src/github.com/wolkdb/go-plasma
