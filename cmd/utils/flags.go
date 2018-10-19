@@ -1119,8 +1119,8 @@ func SetPlasmaConfig(ctx *cli.Context, cfg *plasmachain.Config) {
 		cfg.UseLayer1 = true
 	}
 
-	if ctx.GlobalBool(Layer1Flag.Name) {
-		//cfg.UseLayer1 = true //disabled for now
+	if ctx.GlobalBool(RemoteStorageFlag.Name) {
+		//cfg.RemoteDisabled = false //disabled for now
 	}
 
 	if ctx.GlobalIsSet(Layer1rpcEndpointFlag.Name) {

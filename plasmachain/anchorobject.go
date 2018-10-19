@@ -33,7 +33,6 @@ type encAnchorBlock struct {
 	EndBlock   uint64                    `json:"endBlock"`
 }
 
-//
 func NewAnchorBlock(db *StateDB, anchorTx *deep.AnchorTransaction) *anchorBlock {
 	return &anchorBlock{
 		Anchors:    []*deep.AnchorTransaction{anchorTx},
@@ -47,12 +46,21 @@ func (self *anchorBlock) AddAnchorTx(anchorTx *deep.AnchorTransaction) {
 }
 
 func (self *anchorBlock) Sort() {
-	//TODO: sort the ancorTx within a block
 	sort.Slice(self.Anchors[:], func(i, j int) bool {
 		return self.Anchors[i].BlockNumber < self.Anchors[j].BlockNumber
 	})
 	self.StartBlock = self.Anchors[0].BlockNumber
 	self.EndBlock = self.Anchors[len(self.Anchors)-1].BlockNumber
+}
+
+// pseudo block
+func (a *anchorBlock) GetTxList() (txlist [][]byte) {
+	a.Sort()
+	for _, anchorTx := range a.Anchors {
+		txhash := anchorTx.Hash().Bytes()
+		txlist = append(txlist, txhash)
+	}
+	return txlist
 }
 
 // EncodeRLP implements rlp.Encoder.
