@@ -6,7 +6,14 @@
 
 Reference implementation of plasma in Go.  Wolk has augmented Plasma to support the *Deep Blockchain Architecture* described in this [paper](https://github.com/wolkdb/deepblockchains/blob/master/Deep_Blockchains.pdf).
 
-Currently, Wolk is exploring a "Plasma Hybrid" implementation, where network fees can flow between token owner and operator; in particular, we are extending the original {deposit, exit} schemes with partial withdraw functionality, which will enable operator to withdraw fees without forcing users to exist tokens on the mainNet.
+<img src="https://raw.github.com/wolkdb/deepblockchains/master/paper/Plasma-Hybrid.png" style="width:700px;" alt="Hybrid Plasma Block"/>
+
+Wolk is exploring a "Plasma Hybrid" implementation, where Sparse Merkle Trees are built to keep track both the canonical transactions included in each block and the latest full states.  Hence the name plasma-hybrid.
+
+* Enhanced Plasma Transaction: Additional {`allowance`,`spent`} fields have been added into plasmaTx type. These new fields allow network fees to flow between token owner and operator. In particular, we are working on extending the original {deposit, exit} schemes with partial withdraw functionality, which will enable operator to withdraw fees without forcing users to exist tokens on the mainNet.
+
+* Anchor Transaction: a new transaction type which enables multiple Layer 3 chains to anchor their states on Layer2.
+
 
 ## Background
 
@@ -313,9 +320,10 @@ curl -X POST --data  '{"jsonrpc":"2.0","id":"5","method":"plasma_getPlasmaTransa
 }
 ```
 
+* `getPlasmaExitProof(tokenID uint64)` - get smart exitProof by tokenID. An smart exitProof includes `{prevTxBytes, prevProofByte, preBlk, TxBytes, ProofByte, Blk}`, which is required to start exit on MainNet.
+
 * `getPlasmaTransactionProof(txHash bytes32)` - get inclusion proof { blockNumber, txbyte, proofByte } by txHash. An inclusion proof is required to start exit or challenge double spend on MainNet.
 
-* `getPlasmaExitProof(tokenID uint64)` - get smart exitProof by tokenID. An smart exitProof includes `{prevTxBytes, prevProofByte, preBlk, TxBytes, ProofByte, Blk}`, which is required to start exit on MainNet.
 
 ```
 > plasma.getPlasmaTransactionProof("0x953285f46c56bf5c1f70a0d811b2ddf6ae00ea962f521f1ba20c7dd47d0c2b6f");
