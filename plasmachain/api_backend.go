@@ -33,8 +33,6 @@ type Backend interface {
 	GetAnchorTransactionPool() (txs map[uint64][]*deep.AnchorTransaction)
 	SendAnchorTransaction(tx *deep.AnchorTransaction) (common.Hash, error)
 
-	GetAnchor(blockchainId uint64, blockNumber rpc.BlockNumber, tokenID uint64, sig []byte) (v common.Hash, p *smt.Proof, pendingBalance uint64, err error)
-
 	processDeposit(tokenId []byte, t *TokenInfo) error //replaced by eventhandler
 	startExit(exiter common.Address, denomination uint64, depositIndex uint64, tokenId uint64, ts uint64) error
 	publishedBlock(_rootHash common.Hash, _currentDepositIndex uint64, _blockNumber uint64) error
@@ -88,10 +86,6 @@ func (b *PlasmaApiBackend) SendAnchorTransaction(tx *deep.AnchorTransaction) (tx
 
 func (b *PlasmaApiBackend) GetAnchorTransactionPool() (txs map[uint64][]*deep.AnchorTransaction) {
 	return b.plasma.GetAnchorTransactionPool()
-}
-
-func (b *PlasmaApiBackend) GetAnchor(blockchainId uint64, blockNumber rpc.BlockNumber, tokenID uint64, sig []byte) (v common.Hash, p *smt.Proof, pending uint64, err error) {
-	return b.plasma.GetAnchor(blockchainId, blockNumber, tokenID, sig)
 }
 
 func (b *PlasmaApiBackend) LatestBlockNumber() (blockNumber uint64, err error) {

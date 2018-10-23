@@ -15,6 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/wolkdb/go-plasma/deep"
+	"github.com/wolkdb/go-plasma/merkle"
 	"github.com/wolkdb/go-plasma/plasmachain/eventlog"
 	"github.com/wolkdb/go-plasma/smt"
 )
@@ -211,28 +212,6 @@ func (s *PublicPlasmaAPI) GetAnchorTransactionPool(ctx context.Context) (txs map
 	return s.b.GetAnchorTransactionPool()
 }
 
-func (s *PublicPlasmaAPI) GetAnchor(chainID hexutil.Uint64, blockNumber rpc.BlockNumber, tokenID hexutil.Uint64, sig hexutil.Bytes) (o map[string]interface{}) {
-
-	if blockNumber == rpc.LatestBlockNumber {
-		rawBlockNumber, _ := s.b.LatestBlockNumber()
-		//TODO: check for error
-		blockNumber = rpc.BlockNumber(rawBlockNumber)
-	}
-
-	o = make(map[string]interface{})
-	v, p, pending, err := s.b.GetAnchor(uint64(chainID), blockNumber, uint64(tokenID), sig)
-	if err != nil {
-		o["err"] = fmt.Sprintf("%v", err)
-	} else {
-		o["v"] = v
-		if p != nil {
-			o["proof"] = p.String()
-		}
-		o["pending"] = pending
-	}
-	return o
-}
-
 func (s *PublicPlasmaAPI) EventHandler(event interface{}) (err error) {
 	eventMap := event.(map[string]interface{})
 	eventType, ok := eventMap["event"].(string)
@@ -413,19 +392,30 @@ func RPCMarshalDepositProof(txbyte []byte, proof *smt.Proof, blockNumber uint64,
 	return fields, nil
 }
 
-/*
-func (s *PublicPlasmaAPI) rpcOutputBlock(b *types.Block, inclTx bool, fullTx bool) (map[string]interface{}, error) {
-	fields, err := RPCMarshalProof(b, inclTx, fullTx)
-	if err != nil {
-		return nil, err
+func RPCMarshalAnchorProof(anchorRoot []byte, proof *smt.Proof, blockNumber uint64) (map[string]interface{}, error) {
+	proofByte := proof.Bytes() // copies the header once
+	fields := map[string]interface{}{
+		"anchorRoot":  hexutil.Bytes(anchorRoot),
+		"proofByte":   hexutil.Bytes(proofByte),
+		"blockNumber": hexutil.Uint64(blockNumber),
 	}
-	fields["totalDifficulty"] = (*hexutil.Big)(s.b.GetTd(b.Hash()))
-	return fields, err
+	return fields, nil
 }
-*/
 
-// var header *Header
-// if resp["block"] != nil {
-// 	resbyte, _ := json.Marshal(resp["block"])
-// 	_ = json.Unmarshal(resbyte, &header)
-// }
+func RPCMarshalBlockProof(txbyte []byte, blookProof *merkletree.Proof) (map[string]interface{}, error) {
+	fields := map[string]interface{}{
+		"txbyte": hexutil.Bytes(txbyte),
+		"index":  hexutil.Uint64(blookProof.Index),
+		"root":   hexutil.Bytes(blookProof.Root),
+		"proof":  hexutil.Bytes(blookProof.Proof),
+	}
+	return fields, nil
+}
+
+func RPCMarshalAnchorInfo(chainID uint64, anchorBlkNum uint64) (map[string]interface{}, error) {
+	fields := map[string]interface{}{
+		"chainID":      hexutil.Uint64(chainID),
+		"anchorBlkNum": hexutil.Uint64(anchorBlkNum),
+	}
+	return fields, nil
+}

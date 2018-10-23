@@ -26,6 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/wolkdb/go-plasma/deep"
+	"github.com/wolkdb/go-plasma/merkle"
 	"github.com/wolkdb/go-plasma/smt"
 )
 
@@ -322,6 +323,13 @@ func (self *PlasmaChain) validateTx(rtx deep.Transaction) (err error) {
 	case *Transaction:
 		//Validate Signiture only (does not verify token state ownership)
 		err = rtx.(*Transaction).ValidateSig()
+		if err == nil && rtx.(*Transaction).PrevBlock == 0 {
+			operatorAddr := crypto.PubkeyToAddress(self.operatorKey.PublicKey)
+			signer, _ := rtx.(*Transaction).GetSigner()
+			if bytes.Compare(signer.Bytes(), operatorAddr.Bytes()) != 0 {
+				return fmt.Errorf("Invalid Deposit signer")
+			}
+		}
 	default:
 
 	}
@@ -479,18 +487,9 @@ func (self *PlasmaChain) ApplyAnchorTransaction(s *StateDB, anchorTx *deep.Ancho
 
 func (self *PlasmaChain) StoreAnchorTransaction(tx *deep.AnchorTransaction, blockNumber uint64) (err error) {
 
-	key := tx.Hash().Bytes()
+	// Write raw anchorTX
+	key := append([]byte("raw"), tx.Hash().Bytes()...)
 	txbytes := tx.Bytes()
-
-	/*
-		var tx2 *deep.AnchorTransaction
-		_ = rlp.Decode(bytes.NewReader(txbytes), &tx2)
-		log.Info("PlasmaChunkstore:StoreAnchorTransaction", "Decode", tx2)
-	*/
-
-	//_, tx2 := deep.BytesToAnchorTransaction(txbytes)
-	//enc1, _ := rlp.EncodeToBytes(&tx.Extra)
-	//log.Info("PlasmaChunkstore:StoreAnchorTransaction", "Encode", enc1)
 
 	enc, err := rlp.EncodeToBytes(&tx)
 	if err != nil {
@@ -505,9 +504,16 @@ func (self *PlasmaChain) StoreAnchorTransaction(tx *deep.AnchorTransaction, bloc
 		return err
 	}
 
-	// Write blockNumber
-	key2 := append([]byte("bn"), tx.Hash().Bytes()...)
+	// Write plasma blockNumber
+	key2 := append([]byte("plasmabn"), tx.Hash().Bytes()...)
 	err = self.ChunkStore.SetChunk(key2, deep.UInt64ToByte(blockNumber))
+	if err != nil {
+		return err
+	}
+
+	// Write anchor blockNumber
+	key3 := append([]byte("anchor"), tx.Hash().Bytes()...)
+	err = self.ChunkStore.SetChunk(key3, deep.UInt64ToByte(tx.BlockNumber))
 	if err != nil {
 		return err
 	}
@@ -1125,6 +1131,45 @@ func (self *PlasmaChain) getTransaction(txhash common.Hash) (tx *Transaction, bl
 	return tx, blockNumber, nil
 }
 
+func (self *PlasmaChain) getAnchorTransaction(txhash common.Hash) (anchorTx *deep.AnchorTransaction, blockNumber uint64, err error) {
+	key := append([]byte("raw"), txhash.Bytes()...)
+	val, ok, err := self.ChunkStore.GetChunk(key)
+	if err != nil {
+		log.Info("PlasmaChain:getAnchorTransaction - Error", "error", err)
+		return nil, blockNumber, err
+	} else if !ok {
+		log.Info("PlasmaChain:getAnchorTransaction - Chunk not found")
+		return nil, blockNumber, err
+	} else if len(val) == 0 {
+		return nil, blockNumber, fmt.Errorf("tx %x can't be empty ", key)
+	}
+
+	// mirror decoding
+	var tx *deep.AnchorTransaction
+	err = rlp.Decode(bytes.NewReader(val), &tx)
+	if err != nil && tx == nil {
+		var plasmaTx *Transaction
+		plasmaTx, err2 := DecodeRLPTransaction(val)
+		if err2 == nil && plasmaTx != nil {
+			return nil, blockNumber, errors.New("Looking for PlasmaTx?")
+		}
+		return nil, blockNumber, err
+	}
+
+	// Read blockNumber
+	key2 := append([]byte("plasmabn"), txhash.Bytes()...)
+	val2, ok, err := self.ChunkStore.GetChunk(key2)
+	if err != nil {
+		return nil, blockNumber, nil
+	} else if !ok {
+		return nil, blockNumber, nil
+	} else if len(val2) == 0 {
+		return nil, blockNumber, fmt.Errorf("tx key2 %x can't be empty ", key2)
+	}
+	blockNumber = deep.BytesToUint64(val2)
+	return tx, blockNumber, nil
+}
+
 func (self *PlasmaChain) getBlockTokenTransaction(blockNumber uint64, tokenID uint64) (tx *Transaction, p *smt.Proof, transactionRoot common.Hash, err error) {
 	b, err := self.getBlockByNumber(blockNumber)
 	if err != nil {
@@ -1192,9 +1237,8 @@ func (s *PlasmaChain) APIs() (apis []rpc.API) {
 // Anchor APIs
 /* ========================================================================== */
 
-//TODO: deadcode. complete rewrite required
-func (self *PlasmaChain) GetAnchor(blockchainID uint64, blockNumber rpc.BlockNumber, tokenID uint64, sig []byte) (v common.Hash, p *smt.Proof, pending uint64, err error) {
-	return v, p, pending, err
+func (self *PlasmaChain) GetAnchorTransactionProof(hash common.Hash) (chainID uint64, txbyte []byte, blockProof *merkletree.Proof, smtProof *smt.Proof, anchorBlkNum uint64, blockNumber uint64, err error) {
+	return chainID, txbyte, blockProof, smtProof, anchorBlkNum, blockNumber, err
 }
 
 // Transaction APIs

@@ -5,8 +5,15 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto/sha3"
 )
+
+type Proof struct {
+	Index uint
+	Root  []byte
+	Proof []byte
+}
 
 func is_a_power_of_2(x int) bool {
 	if x == 1 {
@@ -84,4 +91,23 @@ func CheckProof(expectedMerkleRoot []byte, mkproof []byte, index uint) (isValid 
 	} else {
 		return true, merkleroot, nil
 	}
+}
+
+func ToProof(roothash []byte, mkProof []byte, ind uint) (p *Proof) {
+	var externalProof []byte
+	externalProof = append(externalProof, mkProof[32:]...)
+	p = &Proof{Index: ind, Root: roothash, Proof: externalProof}
+	return p
+}
+
+func (self *Proof) String() string {
+	out := fmt.Sprintf("{\"index\":\"%d\",\"root\":\"%x\",\"proof\":[", self.Index, self.Root)
+	for prev := 0; prev < len(self.Proof); prev += 32 {
+		if prev > 0 {
+			out = out + ","
+		}
+		out = out + common.Bytes2Hex(self.Proof[prev:prev+32])
+	}
+	out = out + "]}"
+	return out
 }
