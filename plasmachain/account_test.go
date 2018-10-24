@@ -34,7 +34,7 @@ func TestAccount(t *testing.T) {
 
 	encoded, _ := rlp.EncodeToBytes(testAcct)
 	fmt.Printf("RLP[u]: 0x%x\n", encoded)
-	var a Account // []interface{}
+	var a Account
 	err := rlp.Decode(bytes.NewReader(encoded), &a)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)

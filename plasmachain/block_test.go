@@ -53,13 +53,6 @@ func TestBlock(t *testing.T) {
 	}
 	u.SignBlock(pkey)
 
-	/*
-	   BlockChainID common.Hash  `json:"blockchainId"` //Hash(TokenID, Number)
-	   BlockNumber  uint64       `json:"blocknumber"`
-	   BlockHash    *common.Hash `json:"blockhash"` //= Hash(BlockchainID)
-	   Sig          []byte       `json:"sig"`       //- Signing of BlockHash as MsgHash using private key of owner of TokenID
-	*/
-
 	for i := 0; i < 5; i++ {
 		var wtx deep.AnchorTransaction
 		wtx.BlockNumber = uint64(101 + i)
@@ -74,7 +67,7 @@ func TestBlock(t *testing.T) {
 	}
 
 	encoded, _ := rlp.EncodeToBytes(u)
-	var s Block // []interface{}
+	var s Block
 	s.header = new(Header)
 	s.body = new(Body)
 	err = rlp.Decode(bytes.NewReader(encoded), &s)

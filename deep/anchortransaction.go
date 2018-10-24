@@ -29,82 +29,12 @@ type Ownership struct {
 	RemovedOwners []common.Address `json:"removedOwners" gencodec:"required"`
 }
 
-//go:generate gencodec -type AnchorTransaction -field-override anchorTransactionMarshaling -out anchorTransaction_json.go
-
-//marshalling store external type, if different
+//# go:generate gencodec -type AnchorTransaction -field-override anchorTransactionMarshaling -out anchorTransaction_json.go
 type anchorTransactionMarshaling struct {
 	BlockChainID hexutil.Uint64
 	BlockNumber  hexutil.Uint64
 	Sig          hexutil.Bytes
 }
-
-//StorageRootforSMTOfChunkIDs -- Iterate over all the chunks referenced by the storage root
-
-/*
-func (o *Ownership) EncodeRLP(w io.Writer) (err error) {
-	if len(o.AddedOwners) == 0 && len(o.RemovedOwners) == 0 {
-		err = rlp.Encode(w, 0)
-
-	} else {
-		err = rlp.Encode(w, []interface{}{
-			o.AddedOwners,
-			o.RemovedOwners,
-		})
-	}
-	return err
-}
-
-func (tx *AnchorTransaction) EncodeRLP(w io.Writer) (err error) {
-	if tx == nil {
-		err = rlp.Encode(w, []interface{}{
-			tx.BlockChainID,
-			tx.BlockNumber,
-			tx.BlockHash,
-			0,
-			tx.Sig,
-		})
-	} else {
-
-		data, err := rlp.EncodeToBytes(&tx.Extra)
-		if err == nil {
-			err = rlp.Encode(w, []interface{}{
-				tx.BlockChainID,
-				tx.BlockNumber,
-				tx.BlockHash,
-				data,
-				tx.Sig,
-			})
-		}
-	}
-	return err
-}
-
-func (tx *AnchorTransaction) DecodeRLP(s *rlp.Stream) error {
-	var externalAnchor struct {
-		BlockChainID uint64
-		BlockNumber  uint64
-		BlockHash    *common.Hash
-		Extra        []byte
-		Sig          []byte
-	}
-	if err := s.Decode(&externalAnchor); err != nil {
-		return err
-	}
-	var ownership Ownership
-	if len(externalAnchor.Extra) > 0 {
-		if err := rlp.DecodeBytes(externalAnchor.Extra, &ownership); err != nil {
-			return err
-		}
-	}
-	tx.BlockChainID = externalAnchor.BlockChainID
-	tx.BlockNumber = externalAnchor.BlockNumber
-	tx.BlockHash = externalAnchor.BlockHash
-	tx.Extra = ownership
-	tx.Sig = externalAnchor.Sig
-	return nil
-}
-
-*/
 
 // short hash
 func (tx *AnchorTransaction) ShortHash() (hash common.Hash) {
@@ -117,7 +47,6 @@ func (tx *AnchorTransaction) ShortHash() (hash common.Hash) {
 		Sig:          make([]byte, 0),
 	}
 	enc, _ := rlp.EncodeToBytes(&shortTX)
-	//fmt.Printf("Raw Msg: %x\n", enc)
 	h := Keccak256(enc)
 	return common.BytesToHash(h)
 }
@@ -216,29 +145,6 @@ func (tx *AnchorTransaction) GetSigner() (common.Address, error) {
 	copy(addr[:], crypto.Keccak256(recoveredPub[1:])[12:])
 	return addr, nil
 }
-
-// full RLP-encoded byte sequence
-/*
-func BytesToAnchorTransaction(txbytes []byte) (ok bool, tx *AnchorTransaction) {
-	var anchortx AnchorTransaction
-	err := rlp.DecodeBytes(txbytes, &anchortx)
-	if err != nil {
-		return false, tx
-	}
-	return true, tx
-}
-*/
-
-/*
-func BytesToAnchorTransaction(txbytes []byte) (ok bool, tx *AnchorTransaction) {
-	var anchortx AnchorTransaction
-	err := rlp.Decode(bytes.NewReader(txbytes), &anchortx)
-	if err != nil {
-		return false, tx
-	}
-	return true, tx
-}
-*/
 
 func (tx *AnchorTransaction) Bytes() (enc []byte) {
 	enc, _ = rlp.EncodeToBytes(&tx)

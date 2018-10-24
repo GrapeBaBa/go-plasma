@@ -11,11 +11,7 @@ import (
 )
 
 // tokenObject represents a Plasma token which is being modified.
-//
-// The usage pattern is as follows:
-// First you need to obtain a state object.
-// token balance can be accessed and modified through the object.
-// Finally, call Commit to write the modified token state into cloud storage database.
+
 type tokenObject struct {
 	tokenID uint64
 	db      *StateDB

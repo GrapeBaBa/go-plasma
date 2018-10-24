@@ -16,9 +16,7 @@ func TestBloom(t *testing.T) {
 	for i := 0; i < nkeys; i++ {
 		l[i] = rand.Uint64()
 	}
-
 	bl := NewBloom(l)
-	//	func CheckBloom(b []byte, k uint64) (isMember bool) {
 	for i, v := range l {
 		r := CheckBloom(bl, v)
 		fmt.Printf("l[%d]: %16x => %v\n", i, v, r)

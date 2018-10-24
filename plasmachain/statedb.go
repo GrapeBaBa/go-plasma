@@ -180,7 +180,6 @@ func (self *StateDB) Commit(cs deep.StorageLayer /*blockchainID uint64, */, bloc
 	}
 
 	for blockChainID, anchorBlock := range self.atxList {
-		//self.makeAnchors(anchorTxs)
 		anchorBlock.Sort()
 		encoded, _ := rlp.EncodeToBytes(anchorBlock)
 		log.Debug("anchorBlock: EncodeToBytes", "ENCODED", common.Bytes2Hex(encoded))
@@ -195,16 +194,6 @@ func (self *StateDB) Commit(cs deep.StorageLayer /*blockchainID uint64, */, bloc
 		self.Storage.anchorStorage.Insert(deep.UInt64ToByte(blockChainID), anchorBlock.Bytes(), 0, 0)
 		delete(self.atxList, blockChainID)
 
-		/*
-			var testa anchorObject
-			err = rlp.Decode(bytes.NewReader(encoded), &testa)
-			if err != nil {
-				log.Info("anchorBlock: Verify", "anchorBlock", testa, "v", v, "ERR", err)
-				return nil, err
-			} else {
-				log.Info("anchorBlock: Verify", "anchorBlock", testa)
-			}
-		*/
 	}
 
 	self.Storage.Flush()

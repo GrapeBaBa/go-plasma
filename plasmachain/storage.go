@@ -92,13 +92,3 @@ func (self *Storage) MakeHeaderHash(blockNumber uint64, parentHash, bloomID comm
 	h.AnchorRoot = self.anchorStorage.MerkleRoot()
 	return h
 }
-
-//TODO: re-write deposit code
-func (self *Storage) Deposit(tx *Transaction, denomination uint64, blockNumber uint64) (err error) {
-	return nil
-}
-
-//TODO: re-write deposit code
-func (self *Storage) TokenTransfer(tx *Transaction, newBlockNumber uint64) (err error) {
-	return nil
-}

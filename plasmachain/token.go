@@ -102,7 +102,6 @@ func (tinfo *TokenInfo) TokenID() uint64 {
 }
 
 func NewToken(depositIndex uint64, denomination uint64, depositor common.Address) *Token {
-	//tokenID := tokenKey(depositIndex, denomination, depositor)
 	return &Token{
 		Denomination: denomination,
 		PrevBlock:    0,

@@ -12,7 +12,7 @@ import (
 
 type Block interface {
 	Hash() common.Hash
-	Root() common.Hash // TODO: study this
+	Root() common.Hash
 	Number() uint64
 	Time() *big.Int
 	ParentHash() common.Hash
@@ -32,9 +32,9 @@ type Transaction interface {
 type Transactions []Transaction
 
 type Backend interface {
-	BlockChain() BlockChain     // was: core.BlockChain
-	TxPool() TxPool             // was *core.TxPool
-	StorageLayer() StorageLayer // was *ethdb.Database
+	BlockChain() BlockChain
+	TxPool() TxPool
+	StorageLayer() StorageLayer
 }
 
 type PendingStateEvent struct{}
@@ -99,7 +99,7 @@ type Header interface {
 type ChainEvent struct {
 	Block Block
 	Hash  common.Hash
-	//      Logs  []*types.Log
+	//Logs  []*types.Log
 }
 
 type StorageLayer interface {

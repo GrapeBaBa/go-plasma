@@ -43,8 +43,6 @@ func (self *accountObject) AddToken(tokenID uint64, tokenBalace, tokenDenominati
 		prevAcctDenomination: self.acct.Denomination,
 	})
 	self.acct.Tokens = append(self.acct.Tokens, tokenID)
-	//self.acct.Balance = self.acct.Balance + tokenBalace
-	//self.acct.Denomination = self.acct.Denomination + tokenDenomination
 	self.acct.Balance = new(big.Int).Add(self.Balance(), tokenBalace)
 	self.acct.Denomination = new(big.Int).Add(self.Denomination(), tokenDenomination)
 }
@@ -63,8 +61,6 @@ func (self *accountObject) RemoveToken(tokenID uint64, tokenBalace, tokenDenomin
 		}
 	}
 	self.acct.Tokens = updatedTokenList
-	//self.acct.Balance = self.acct.Balance - tokenBalace
-	//self.acct.Denomination = self.acct.Denomination - tokenDenomination
 	self.acct.Balance = new(big.Int).Sub(self.Balance(), tokenBalace)
 	self.acct.Denomination = new(big.Int).Sub(self.Denomination(), tokenDenomination)
 }

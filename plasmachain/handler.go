@@ -93,40 +93,27 @@ func errResp(code errCode, format string, v ...interface{}) error {
 }
 
 type ProtocolManager struct {
-	appId       uint64
-	networkId   uint64
-	plasmaChain *PlasmaChain
-
-	maxPeers int
-
-	peers *peerSet
-
-	SubProtocols []p2p.Protocol
-
-	scope event.SubscriptionScope
-
-	anchor_txCh  chan AnchorTxPreEvent
-	anchor_txSub event.Subscription
-	AnchorTxFeed event.Feed
-
-	plasma_txCh  chan PlasmaTxPreEvent
-	plasma_txSub event.Subscription
-	eventMux     *event.TypeMux
-	PlasmaTxFeed event.Feed
-
-	// channels for fetcher, syncer, txsyncLoop
-	newPeerCh   chan *peer
-	txsyncCh    chan *txsync
-	quitSync    chan struct{}
-	noMorePeers chan struct{}
-
-	//channel for passing Block
-	generatedPlasmaBlockSub *event.TypeMuxSubscription
-
-	// wait group is used for graceful shutdowns during downloading
-	// and processing
-	wg     sync.WaitGroup
-	txpool *PlasmaTxPool
+	appId                   uint64
+	networkId               uint64
+	plasmaChain             *PlasmaChain
+	maxPeers                int
+	peers                   *peerSet
+	SubProtocols            []p2p.Protocol
+	scope                   event.SubscriptionScope
+	anchor_txCh             chan AnchorTxPreEvent
+	anchor_txSub            event.Subscription
+	AnchorTxFeed            event.Feed
+	plasma_txCh             chan PlasmaTxPreEvent
+	plasma_txSub            event.Subscription
+	eventMux                *event.TypeMux
+	PlasmaTxFeed            event.Feed
+	newPeerCh               chan *peer
+	txsyncCh                chan *txsync  // txsyncLoop
+	quitSync                chan struct{} // syncer
+	noMorePeers             chan struct{}
+	generatedPlasmaBlockSub *event.TypeMuxSubscription // channel for passing Block
+	wg                      sync.WaitGroup             // wait group is used for graceful shutdowns during downloading and processing
+	txpool                  *PlasmaTxPool
 }
 
 // NewProtocolManager returns a new ethereum sub protocol manager. The Ethereum sub protocol manages peers capable

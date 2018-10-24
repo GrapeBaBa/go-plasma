@@ -40,52 +40,6 @@ func generateRandomData(l int) (r io.Reader, slice []byte) {
 	return
 }
 
-/*
-func TestAnchor(t *testing.T) {
-
-	// set up Anchor to L2
-	blockchaincnt := uint64(0)
-	tokenID := uint64(1234)
-	blockchainID := uint64(222) //TODO: use testConfig
-
-	var pkey *ecdsa.PrivateKey
-	pkey, err := crypto.HexToECDSA("afc522d1476e251535e53abb92bcfa7cfd7ef5c86442ef95e20714f053551574")
-	if err != nil {
-		t.Fatalf("HexToECDSA err %v", err)
-	}
-	a, err := deep.NewAnchorStorage(blockchainID, tokenID, pkey)
-	if err != nil {
-		t.Fatalf("HexToECDSA err %v", err)
-	}
-
-	blockHashes := make(map[uint64]*common.Hash)
-	nblocks := uint64(10)
-	for blockNumber := uint64(0); blockNumber <= nblocks; blockNumber++ {
-		blockHash := common.BytesToHash(deep.Keccak256([]byte(fmt.Sprintf("test%d", blockNumber))))
-		blockHashes[blockNumber] = &blockHash
-
-		tx := a.CreateAnchorTransaction(blockNumber, &blockHash)
-		tx.AddOwner(common.HexToAddress("0xba3e1663ada8f3e4e1574bab2494c727d7cb81aa"))
-		tx.AddOwner(common.HexToAddress("0xba3e1663ada8f3e4e1574bab2494c727d7cb81aa"))
-		tx.AddOwner(common.HexToAddress("0xba3e1663ada8f3e4e1574bab2494c727d7cb81ab"))
-		tx.RemoveOwner(common.HexToAddress("0xba3e1663ada8f3e4e1574bab2494c727d7cb81ab"))
-		err := a.SendAnchorTransaction(tx)
-		if err != nil {
-			fmt.Printf("SendAnchorTransaction ERROR: %v", err)
-		}
-	}
-}
-
-func TestGetAnchor(t *testing.T) {
-}
-
-func TestSetChunk(t *testing.T) {
-}
-
-func TestGetChunk(t *testing.T) {
-}
-*/
-
 const (
 	DefaultEndpointUrl = "http://c0.wolk.com:9900"
 )
@@ -130,12 +84,10 @@ func (c *Config) IsLocalMode() bool         { return c.RemoteDisabled }
 
 func newRemoteStorage(config *Config) (rs *RemoteStorage, err error) {
 	log.Root().SetHandler(log.CallerFileHandler(log.LvlFilterHandler(log.LvlInfo, log.StreamHandler(os.Stderr, log.TerminalFormat(true)))))
-	_blockchainId := uint64(42)
-	//_endpointUrl := DefaultEndpointUrl
+	_blockchainID := uint64(42)
 	_chainType := "sql"
-	//	_tokenID := uint64(1234)
 	operatorKey, _ := crypto.HexToECDSA(operatorPrivateKey)
-	rs, err = NewRemoteStorage(_blockchainId, config, _chainType, operatorKey)
+	rs, err = NewRemoteStorage(_blockchainID, config, _chainType, operatorKey)
 	if err != nil {
 		return nil, err
 	}
@@ -520,15 +472,6 @@ func TestCreateAnchorTransaction(t *testing.T) {
 		//TODO: correctly verify sig: t.Fatalf("[TestCreateAnchorTransaction] Error : Issue with Anchor TX Signature e v[%x] a[%x]", expectedSig, tx.Sig)
 	}
 
-	/*
-		type AnchorTransaction struct {
-			BlockChainID uint64       `json:"blockchainID"    gencodec:"required"`
-			BlockNumber  uint64       `json:"blocknumber"     gencodec:"required"`
-			BlockHash    *common.Hash `json:"blockhash"       gencodec:"required"`
-			Extra        Ownership    `json:"extra"`
-			Sig          []byte       `json:"sig"             gencodec:"required"`
-		}
-	*/
 }
 
 func TestGetChunkCloudstore(t *testing.T) {

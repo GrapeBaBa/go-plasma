@@ -45,7 +45,7 @@ type PlasmaChain struct {
 	ChainConfig     *params.ChainConfig
 	ChunkStore      deep.StorageLayer
 	Storage         *Storage
-	shutdownChan    chan bool // Channel for shutting down plasma
+	shutdownChan    chan bool
 	protocolManager *ProtocolManager
 	eventMux        *event.TypeMux
 	accountManager  *accounts.Manager
@@ -54,7 +54,7 @@ type PlasmaChain struct {
 	chainFeed       event.Feed
 	chainSideFeed   event.Feed
 	chainHeadFeed   event.Feed
-	lock            sync.RWMutex // Protects the variadic fields (e.g. gas price and etherbase)
+	lock            sync.RWMutex
 }
 
 // New creates a new Plasma object (including the initialisation of the common Plasma object)
@@ -320,6 +320,13 @@ func (self *PlasmaChain) validateTx(rtx deep.Transaction) (err error) {
 	case *deep.AnchorTransaction:
 		//Validate ExtraData only (does not verify blockchain ownership)
 		err = rtx.(*deep.AnchorTransaction).ValidateAnchor()
+		if err == nil && rtx.(*deep.AnchorTransaction).BlockNumber == 0 {
+			operatorAddr := crypto.PubkeyToAddress(self.operatorKey.PublicKey)
+			signer, _ := rtx.(*deep.AnchorTransaction).GetSigner()
+			if bytes.Compare(signer.Bytes(), operatorAddr.Bytes()) != 0 {
+				log.Warn("L3chain", "Event", "Unauthorized Chain Registration", "Registrant", signer.Hex())
+			}
+		}
 	case *Transaction:
 		//Validate Signiture only (does not verify token state ownership)
 		err = rtx.(*Transaction).ValidateSig()
@@ -331,7 +338,7 @@ func (self *PlasmaChain) validateTx(rtx deep.Transaction) (err error) {
 			}
 		}
 	default:
-
+		// TODO: state transaction type
 	}
 
 	if err != nil {
@@ -368,8 +375,6 @@ func (self *PlasmaChain) ApplyAnchorTransaction(s *StateDB, anchorTx *deep.Ancho
 	if err != nil {
 		return err
 	}
-
-	//TODO: validate signer from ownerlist. Prevent Anchor0 spam
 
 	if anchorTx.BlockNumber == 0 {
 		//Register Layer3 Block

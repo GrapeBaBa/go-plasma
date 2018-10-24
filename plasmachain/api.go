@@ -322,7 +322,6 @@ type KeyVal struct {
 	Val interface{}
 }
 
-//TODO: Define an ordered map
 type OrderedMap []KeyVal
 
 func (omap OrderedMap) MarshalJSON() ([]byte, error) {

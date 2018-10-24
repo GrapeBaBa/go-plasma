@@ -19,7 +19,6 @@ func setConnection(endpointUrl string) (conn *ethclient.Client, err error) {
 		log.Debug("Failed to connect", "client", endpointUrl, "err", err)
 		return conn, err
 	} else {
-		//fmt.Printf("Successfully connected to: %v\n", endpointUrl)
 		return conn, err
 	}
 }

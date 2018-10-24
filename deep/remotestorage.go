@@ -626,21 +626,3 @@ func (self *RemoteStorage) CleanCache(size uint64) {
 	self.cachemu.Unlock()
 }
 */
-
-/*
-func (self *RemoteStorage) GetChunkBatchLocal(chunks []*Chunk) (err error) {
-	if self.ldb == nil {
-		return fmt.Errorf("cache unavailable")
-	}
-	for i, chunk := range chunks {
-		v, ok, err := self.GetChunkLocal(chunk.ChunkID)
-		if err != nil {
-			chunks[i].Error = err
-		}
-		chunks[i].OK = ok
-		chunks[i].Value = v
-		log.Info(fmt.Sprintf("Chunk found index[%d], len(chunk) [%d] chunk [%+v] err (%+v)", i, len(chunks[i].Value), chunks[i].OK, chunks[i].Error))
-	}
-	return nil
-}
-*/

@@ -39,9 +39,6 @@ func TestPlasmaChainInternal(t *testing.T) {
 		sleeptime      = 5000
 	)
 
-	//var DefaultHashes = smt.ComputeDefaultHashes()
-	//DefaultHashes = smt.ComputeDefaultHashes()
-
 	testAcct := map[string]string{
 		"0xA45b77a98E2B840617e2eC6ddfBf71403bdCb683": "6545ddd10c1e0d6693ba62dec711a2d2973124ae0374d822f845d322fb251645",
 		"0x82Da88C31E874C678D529ad51E43De3A4BAF3914": "91dae949703266bcd67ef2dfa9a20d7b62b25520a8375c6a5fad16bd72ae9d4e",
@@ -245,9 +242,6 @@ func (self *PlasmaChain) generateInternalProof(txHash common.Hash, verbose bool)
 	if verbose {
 		fmt.Printf("\n\n***** [0x%x] Smart Exit (Auto Generated for: %s) *****\n\nStartExit(\nbytes  prevtxBytes 0x%x, \nbytes  prevProof   0x%x,\nuint64 prevBlock   %d,\n\nbytes  currtxBytes 0x%x,\nbytes  currProof   0x%x,\nuint64 currBlock   %d)\n\n\n",
 			tokenID, currTx.Recipient.Hex(), prevTx.Bytes(), prevProof.Bytes(), prevBlk, currTx.Bytes(), currProof.Bytes(), currBlk)
-
-		// fmt.Printf("Remix Encode\n%s, %s, %d, %s, %s, %d\n\n",
-		// 	hexArr(prevTx.Bytes()), hexArr(prevProof.Bytes()), prevBlk, hexArr(currTx.Bytes()), hexArr(currProof.Bytes()), currBlk)
 	} else {
 		fmt.Println("")
 	}

@@ -59,7 +59,8 @@ func (c *Config) GetCloudstorePort() uint64 { return c.CloudstorePort }
 func (c *Config) GetDataDir() string        { return c.DataDir }
 func (c *Config) IsLocalMode() bool         { return c.RemoteDisabled }
 
-/*
+/* Network Options
+
 Local (Ganache)
 L1rpcEndpointUrl: "http://localhost:8545"
 L1wsEndpointUrl:  "ws://localhost:8545"

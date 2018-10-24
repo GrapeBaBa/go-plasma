@@ -76,8 +76,8 @@ type encHeader struct {
 	Sig             []byte      `json:"sig"`
 }
 
-//# go:generate gencodec -type Header -field-override headetMarshaling -out header_json.go
-type headetMarshaling struct {
+//# go:generate gencodec -type Header -field-override headerMarshaling -out header_json.go
+type headerMarshaling struct {
 	BlockNumber hexutil.Uint64
 	Time        hexutil.Uint64
 	Sig         hexutil.Bytes
@@ -302,7 +302,7 @@ func (block *Block) String() string {
 }
 
 func FromChunk(in []byte) (b *Block) {
-	var ob Block // []interface{}
+	var ob Block
 	ob.header = new(Header)
 	ob.body = new(Body)
 	err := rlp.Decode(bytes.NewReader(in), &ob)
@@ -383,7 +383,7 @@ func (header *Header) NumberU64() (n uint64) {
 }
 
 func FromHeader(in []byte) (b *Header) {
-	var h Header // []interface{}
+	var h Header
 	err := rlp.Decode(bytes.NewReader(in), &h)
 	if err != nil {
 		return nil

@@ -10,7 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
-var _ = (*headetMarshaling)(nil)
+var _ = (*headerMarshaling)(nil)
 
 // MarshalJSON marshals as JSON.
 func (h Header) MarshalJSON() ([]byte, error) {

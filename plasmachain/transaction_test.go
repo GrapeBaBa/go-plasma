@@ -144,7 +144,6 @@ func TestTransaction(t *testing.T) {
 	}
 
 	str := `{"tokenID":11378577392995273713,"denomination":50000000000000000,"depositIndex":12,"prevBlock":3,"prevOwner":"0x069984a8d9ebb6b15eb144e0cb01a81b9c7379b0","recipient":"0xf91a593154c170017fbed4b0348e259827642bd8","allowance":30000000000000000,"spent":10000000000000001,"sig": "21KVTf5c8oL1X9lreV50IVYOW0L+Gm+3bHY6IhUqVy0lMupN0FYgUHa7s5DqdksoqtsMwzr4k9RVYoU5a3xjoAE=" }`
-	//tx4 := Transaction{}
 	var tx4 Transaction
 	json.Unmarshal([]byte(str), &tx4)
 	fmt.Printf("Transfer: %s\ntxhash : 0x%x\nmsghash: 0x%x\n", tx4.String(), tx.Hash(), tx.ShortHash())
