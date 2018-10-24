@@ -670,7 +670,7 @@ func (self *PlasmaChain) ApplyPlasmaTransaction(s *StateDB, tx *Transaction) (er
 }
 
 func (self *PlasmaChain) StoreTransaction(tx *Transaction, blockNumber uint64) (err error) {
-	key := tx.Hash().Bytes()
+	key := append([]byte("raw"), tx.Hash().Bytes()...)
 	txbytes := tx.Bytes()
 	err = self.ChunkStore.SetChunk(key, txbytes)
 	log.Debug("PlasmaChain:StoreTransaction", "key", common.Bytes2Hex(key), "txbytes", common.Bytes2Hex(txbytes))
@@ -679,7 +679,7 @@ func (self *PlasmaChain) StoreTransaction(tx *Transaction, blockNumber uint64) (
 	}
 
 	// Write blockNumber
-	key2 := append([]byte("bn"), tx.Hash().Bytes()...)
+	key2 := append([]byte("plasmabn"), tx.Hash().Bytes()...)
 	err = self.ChunkStore.SetChunk(key2, deep.UInt64ToByte(blockNumber))
 	log.Debug("plasmachain:StoreTransaction", "key2", common.Bytes2Hex(key2), "blockNumber", deep.UInt64ToByte(blockNumber))
 	if err != nil {
@@ -1100,7 +1100,7 @@ func (self *PlasmaChain) getTokenInfo(tokenID uint64) (tInfo *TokenInfo, err err
 }
 
 func (self *PlasmaChain) getTransaction(txhash common.Hash) (tx *Transaction, blockNumber uint64, err error) {
-	key := txhash.Bytes()
+	key := append([]byte("raw"), txhash.Bytes()...)
 	val, ok, err := self.ChunkStore.GetChunk(key)
 	if err != nil {
 		log.Info("PlasmaChain:getTransaction - Error", "error", err)
@@ -1123,7 +1123,7 @@ func (self *PlasmaChain) getTransaction(txhash common.Hash) (tx *Transaction, bl
 		return nil, blockNumber, err
 	}
 	// Read blockNumber
-	key2 := append([]byte("bn"), txhash.Bytes()...)
+	key2 := append([]byte("plasmabn"), txhash.Bytes()...)
 	val2, ok, err := self.ChunkStore.GetChunk(key2)
 	if err != nil {
 		return nil, blockNumber, nil
