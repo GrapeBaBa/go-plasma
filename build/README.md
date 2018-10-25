@@ -42,7 +42,7 @@ docker pull wolkinc/go-plasma
 #### Deploying PLASMA Docker Container
 _Note: This command also automatically starts the PLASMA server_
 ```
-docker run --name=plasma -dit -p 5001:5000 -p 5001:5000 -p 8505:8505 -p 30303:30303 -p 30303:30303/udp wolkinc/go-plasma /Users/plasma/qdata/dd 8505
+docker run --name=plasma -dit -p 5001:5000 -p 8505:8505 -p 30303:30303 -p 30303:30303/udp wolkinc/go-plasma /Users/plasma/qdata/dd 8505
 ```
 
 ## Verify PLASMA process
