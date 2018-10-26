@@ -1,68 +1,63 @@
-# Install Docker CE (Community Edition)
-https://www.docker.com/community-edition#/download
+## Docker Prerequisites
+### Docker CE (Community Edition)
 
-### CentOS:
-  - Installation instructions: https://docs.docker.com/engine/installation/linux/docker-ce/centos/
+|OS| System Prerequisites | Installation
+|:--:|:--|:--:|
+|CentOS|7.x (64-bit)| [Download](https://store.docker.com/editions/community/docker-ce-server-centos)  ([Instruction](https://docs.docker.com/install/linux/docker-ce/centos/)) |
+|Debian|Buster 10, Stretch 9, Jessie 8.0, Wheezy 7.7 (64-bit)| [Download](https://store.docker.com/editions/community/docker-ce-server-debian)  ([Instruction](https://docs.docker.com/install/linux/docker-ce/debian/)) |
+|Fedora|Fedora 28, Fedora 27, Fedora 26 (64-bit)| [Download](https://store.docker.com/editions/community/docker-ce-server-fedora) ([Instruction](https://docs.docker.com/install/linux/docker-ce/fedora/)) |
+|Ubuntu|Bionic 18.04 (LTS), Xenial 16.04 (LTS), Trusty 14.04 (LTS)| [Download](https://store.docker.com/editions/community/docker-ce-server-ubuntu) ([Instruction](https://docs.docker.com/install/linux/docker-ce/ubuntu/)) |
+|OSX|El Capitan 10.11 or above| [Download](https://store.docker.com/editions/community/docker-ce-desktop-mac) ([Instruction](https://docs.docker.com/docker-for-mac)) |
+|MS|Windows 10 Pro, Enterprise or Education(64-bit)| [Download](https://store.docker.com/editions/community/docker-ce-desktop-windows) ([Instruction](https://docs.docker.com/docker-for-windows/)) |
+|Others | See  Docker website for details |  [Download](https://store.docker.com/search?type=edition&offering=community) ([Instruction](https://docs.docker.com/install))
 
-### Mac:
-  - Installation instructions: https://store.docker.com/editions/community/docker-ce-desktop-mac
-
-### Others:
-  - https://www.docker.com/community-edition#/download
-  
-# System Prerequisites
-
-|OS| Prerequisite |
-|--|:--|
-|CentOS|7.x (64-bit)|
-|RedHat|RHEL 7.x (64-bit)|
-|Debian|Stretch, Jessie 8.0, Wheezy 7.7 (64-bit)|
-|Fedora|Fedora 25, Fedora 24 (64-bit)|
-|Ubuntu|Zesty 17.04 (LTS),Yakkety 16.10, Xenial 16.04 (LTS),Trusty 14.04 (LTS)|
-|OSX|Yosemite 10.11 or above|
-|MS|Windows 10 Professional or Enterprise (64-bit)|
-
-### Before downloading the docker image, please install Python27 or higher on your system:
-  - https://www.python.org/downloads/release/python-latest
-
-### Once installed, verify the python version:
-      $ python -V
-      Python 2.7.10
-      
-## Downloading and deploying Docker
-
-## Downloading and deploying Docker
-
-### PLASMA
-#### Download PLASMA Docker Image
+### Python
+[Python 2.7](https://www.python.org/downloads/release/python-latest) or higher is required for docker image. Verify that python version has been installed in the system:
 ```
-docker pull wolkinc/go-plasma
+$ python -V
+Python 2.7.10
 ```
 
-#### Deploying PLASMA Docker Container
-_Note: This command also automatically starts the PLASMA server_
+## Plamsa Docker Image
+#### Starting Docker
+##### Download Plamsa Docker Image
 ```
-docker run --name=plasma -dit -p 5001:5000 -p 8505:8505 -p 30303:30303 -p 30303:30303/udp wolkinc/go-plasma /Users/plasma/qdata/dd 8505
+$ docker pull wolkinc/go-plasma
 ```
-
-## Verify PLASMA process
-
-Once the Docker image and containers are deployed following above instructions, it will start the PLASMA process inside the Docker container. To verify if PLASMA is running:
-
-##### Attach to the docker shell/console
-    $ docker exec -it `docker ps -q -l` /bin/bash
-
-##### From outside the Docker container
-    $ docker exec `docker ps -a | grep go-plasma | awk '{print$1}'` ps aux | grep "plasma --datadir"
-    
-##### From within the Docker container
-    $ ps aux | grep "plasma --datadir"
-    
-### PLASMA Port Mapping:
+##### Deploying Plamsa Docker Container
+```
+$ docker run --name=plasma -dit -p 8505:8505 -p 30303:30303 -p 30303:30303/udp wolkinc/go-plasma /tmp/plasmachain/ 8505
+```
+##### Plamsa Port Mapping
 
 | Ports | Descriptions |
-|--|--|
-| 5001:5000 | <Syslog_system_port>:<Syslog_container_port> |
+|--|:--|
 | 8505:8505 | <RPC_system_port>:<RPC_container_port> |
 | 30303:30303 | <Network_Listening_system_TCP_port>:<Network_Listening_container_TCP_port> |
 | 30303:30303/udp | <Network_Listening_system_UDP_port>:<Network_Listening_container_UDP_port> |
+
+_*Note_: This command also automatically starts the Plamsa server
+
+#### Interacting with Docker
+Once the Docker image and containers are deployed, Plamsa server will run inside the Docker container. Using the following cmds to interact with Plasma server:
+
+##### Attach to the docker container/console
+```
+$ docker exec -it `docker ps -q -l` /bin/bash
+```
+##### Exit the Docker container/console
+```
+$ ctrl + d (or simply type exit and Enter)
+```
+##### Check Plasma Status outside of the Docker container
+```
+$ docker exec `docker ps -a | grep go-plasma | awk '{print$1}'` ps aux | grep "plasma --datadir"
+```
+##### Clean/delete all containers
+```
+$ docker stop `docker ps -a -q`; docker rm `docker ps -a -q`
+```
+##### Clean/delete all the images (once the container/s have been deleted)
+```
+$ docker rmi `docker images -q`
+```
